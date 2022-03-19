@@ -1,17 +1,27 @@
 package com.ebookfrenzy.merendasoundboard
 
+import android.content.res.Resources
 import android.media.MediaPlayer
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.Button
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val BUTTON_SIZE = 120
+        private const val SPACING = 8
+    }
+
     private lateinit var recyclerView: RecyclerView
     private val mp = MediaPlayer()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,9 +29,28 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.sound_recycler_view)
         recyclerView.apply {
             adapter = SoundAdapter(SoundDatabase.listSound)
-            layoutManager = GridLayoutManager(this@MainActivity, 3)
-            addItemDecoration(GridSpacingItemDecoration(3, 50, false))
+
+            val span = calcSpan()
+            layoutManager = GridLayoutManager(this@MainActivity, span)
+            addItemDecoration(GridSpacingItemDecoration(span, convertDpToPx(SPACING), false))
         }
+    }
+
+    private fun calcSpan(): Int {
+        // width = BUTTON_SIZE * x + (x-1) * spacing
+        val x = BUTTON_SIZE + 8
+        val width = resources.configuration.screenWidthDp + SPACING
+        val result = (width + SPACING) / x
+        return result.toInt()
+    }
+
+    private fun convertDpToPx(dp: Int): Int {
+        val px = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp.toFloat(),
+            resources.displayMetrics
+        )
+        return px.toInt()
     }
 
     fun playSound(id: Int) {
@@ -85,4 +114,6 @@ class MainActivity : AppCompatActivity() {
             playSound(sound!!.id)
         }
     }
+
+
 }
