@@ -1,17 +1,17 @@
 package com.ebookfrenzy.merendasoundboard
 
 import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
+    private val mp = MediaPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,11 +20,38 @@ class MainActivity : AppCompatActivity() {
         recyclerView.apply {
             adapter = SoundAdapter(SoundDatabase.listSound)
             layoutManager = GridLayoutManager(this@MainActivity, 3)
+            addItemDecoration(GridSpacingItemDecoration(3, 50, false))
         }
     }
 
     fun playSound(id: Int) {
-        MediaPlayer.create(this, id).start()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            with(mp) {
+                reset()
+                setDataSource(resources.openRawResourceFd(id))
+                prepare()
+                start()
+            }
+        } else {
+            MediaPlayer.create(this, id).start()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.add_new_sound, menu)
+        return true
+    }
+
+    /*
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(R.menu.add_new_sound == item.itemId) {
+            createNewSound()
+        }
+    }*/
+
+    private fun createNewSound() {
+
     }
 
     inner class SoundAdapter(private val soundList: List<Sound>) : RecyclerView.Adapter<SoundViewHolder>() {
