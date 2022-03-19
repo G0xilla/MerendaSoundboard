@@ -1,11 +1,9 @@
 package com.ebookfrenzy.merendasoundboard
 
-import android.content.res.Resources
 import android.media.MediaPlayer
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.Button
@@ -40,8 +38,7 @@ class MainActivity : AppCompatActivity() {
         // width = BUTTON_SIZE * x + (x-1) * spacing
         val x = BUTTON_SIZE + 8
         val width = resources.configuration.screenWidthDp + SPACING
-        val result = (width + SPACING) / x
-        return result.toInt()
+        return (width + SPACING) / x
     }
 
     private fun convertDpToPx(dp: Int): Int {
