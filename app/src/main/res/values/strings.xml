@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MerendaSoundboard</string>
     <string name="new_sound">New Sound</string>
+    <string name="name">Name</string>
 </resources>

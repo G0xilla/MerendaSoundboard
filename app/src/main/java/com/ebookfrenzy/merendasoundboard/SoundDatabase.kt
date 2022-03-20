@@ -1,9 +1,21 @@
 package com.ebookfrenzy.merendasoundboard
 
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import androidx.lifecycle.MutableLiveData
+import com.ebookfrenzy.merendasoundboard.db.SoundBaseHelper
+import com.ebookfrenzy.merendasoundboard.db.SoundCursorWrapper
+import com.ebookfrenzy.merendasoundboard.db.SoundTable
+import java.util.ArrayList
+
 object SoundDatabase {
-    val listSound = mutableListOf<Sound>()
+    val listSound = MutableLiveData<ArrayList<Sound>>()
+    private var db: SQLiteDatabase? = null
 
     init {
+        listSound.value = ArrayList()
+
         listSound.apply {
             add("a to", R.raw.a_to)
             add("ale dobry", R.raw.ale_dobry)
@@ -21,7 +33,48 @@ object SoundDatabase {
         }
     }
 
-    private fun MutableList<Sound>.add(name: String, id: Int) {
-        add(Sound(name, id))
+    private fun add(name: String, id: Int) {
+        listSound.value?.add(SoundResources(name, id))
+    }
+
+    private fun add(name: String, uri: String) {
+        listSound.value?.add(SoundFile(name, uri))
+    }
+    fun load(context: Context) {
+        db = SoundBaseHelper(context.applicationContext).writableDatabase
+
+        val cursor = queryCrimes(null, null)
+        cursor.use { cursor ->
+            cursor.moveToFirst()
+            while (!cursor.isAfterLast) {
+                listSound.value!!.add(cursor.getSound())
+                cursor.moveToNext()
+            }
+        }
+        cursor.close()
+    }
+
+    fun addSound(name: String, uri: String) {
+        val values = ContentValues().apply {
+            put(SoundTable.Cols.NAME, name)
+            put(SoundTable.Cols.PATH, uri)
+        }
+
+        db!!.insert(SoundTable.NAME, null, values)
+
+        add(name, uri)
+    }
+
+    private fun queryCrimes(whereClause: String?, whereArgs: Array<String>?): SoundCursorWrapper {
+        val cursor = db?.query(
+            SoundTable.NAME,
+            null,
+            whereClause,
+            whereArgs,
+            null,
+            null,
+            null)
+
+        return SoundCursorWrapper(cursor!!)
     }
 }
