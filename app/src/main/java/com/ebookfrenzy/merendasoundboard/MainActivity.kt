@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        createDbObserver()
         SoundDatabase.load(this)
 
-        createDbObserver()
+
         recyclerView = findViewById(R.id.sound_recycler_view)
         recyclerView.apply {
             adapter = SoundAdapter(SoundDatabase.listSound.value!!)
@@ -135,16 +135,24 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int = soundList.size
     }
 
-    inner class SoundViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class SoundViewHolder(view: View)
+        : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnLongClickListener {
+
         val button: Button = view.findViewById(R.id.button_sound)
         var sound: Sound? = null
 
         init {
             button.setOnClickListener(this)
+            button.setOnLongClickListener(this)
         }
 
         override fun onClick(view: View?) {
             playSound(sound!!)
+        }
+
+        override fun onLongClick(view: View?): Boolean {
+            SoundDatabase.removeSound(sound!!)
+            return true
         }
     }
 }

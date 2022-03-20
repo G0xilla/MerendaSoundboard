@@ -39,7 +39,9 @@ object SoundDatabase {
 
     private fun add(name: String, uri: String) {
         listSound.value?.add(SoundFile(name, uri))
+        listSound.value = listSound.value
     }
+
     fun load(context: Context) {
         db = SoundBaseHelper(context.applicationContext).writableDatabase
 
@@ -47,7 +49,7 @@ object SoundDatabase {
         cursor.use { cursor ->
             cursor.moveToFirst()
             while (!cursor.isAfterLast) {
-                listSound.value!!.add(cursor.getSound())
+                listSound.value?.add(cursor.getSound())
                 cursor.moveToNext()
             }
         }
@@ -63,6 +65,14 @@ object SoundDatabase {
         db!!.insert(SoundTable.NAME, null, values)
 
         add(name, uri)
+    }
+
+    fun removeSound(sound: Sound) {
+        if(sound is SoundFile) {
+            listSound.value!!.remove(sound)
+            listSound.value = listSound.value
+            db?.delete(SoundTable.NAME, "name=?", arrayOf(sound.name))
+        }
     }
 
     private fun queryCrimes(whereClause: String?, whereArgs: Array<String>?): SoundCursorWrapper {
