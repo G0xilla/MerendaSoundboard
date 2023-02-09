@@ -1,2 +1,2 @@
 # MerendaSoundboard
-fuckin' the best thing on github ngl
+nejlepsi projekt na celem githubu
